@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>語源ラボ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #1C3B32;
+    --bg-deep: #16302A;
+    --card: #F6F0E1;
+    --ink: #22303A;
+    --ink-soft: #55625E;
+    --coral: #E1563F;
+    --coral-deep: #C4432E;
+    --mint: #4E9C82;
+    --mustard: #E2A93B;
+    --indigo: #8B3DF2;
+    --indigo-deep: #5B1FB8;
+    --line: rgba(34,48,58,0.14);
+    --shadow: rgba(10,22,18,0.35);
+  }
+  :root:not([data-theme="light"]){
+    --bg: #16302A;
+    --bg-deep: #10241F;
+  }
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html,body{ margin:0; padding:0; height:100%; }
+  body{
+    background: radial-gradient(120% 140% at 50% -10%, var(--bg) 0%, var(--bg-deep) 100%);
+    font-family: 'Zen Kaku Gothic New', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    overflow-x:hidden;
+  }
+  .app{
+    width:100%;
+    max-width:440px;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding: max(18px, env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+    position:relative;
+  }
+
+  /* Header */
+  .app-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    padding: 4px 4px 14px;
+  }
+  .app-title{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size: clamp(1.15rem, 5vw, 1.4rem);
+    color:#F3ECD9;
+    letter-spacing: 0.01em;
+  }
+  .app-title small{
+    display:block;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size: 0.62rem;
+    font-weight:500;
+    color: rgba(243,236,217,0.55);
+    letter-spacing: 0.08em;
+    margin-top:2px;
+  }
+  .progress-pill{
+    font-size: 0.72rem;
+    font-weight:700;
+    color:#F3ECD9;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 999px;
+    padding: 6px 12px;
+    white-space:nowrap;
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+  .progress-pill b{ color: var(--mustard); font-weight:800; }
+
+  /* Card stack area */
+  .stage{
+    position:relative;
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 10px 0 22px;
+    min-height: 420px;
+  }
+  .deck-shadow{
+    position:absolute;
+    width: 84%;
+    max-width:340px;
+    aspect-ratio: 3 / 4.1;
+    border-radius: 22px;
+  }
+  .deck-shadow.d1{ background: rgba(246,240,225,0.14); transform: rotate(-6deg) translateY(10px); }
+  .deck-shadow.d2{ background: rgba(246,240,225,0.09); transform: rotate(5deg) translateY(16px); }
+
+  .card{
+    position:relative;
+    width: 84%;
+    max-width:340px;
+    aspect-ratio: 3 / 4.1;
+    background: var(--card);
+    border-radius: 22px;
+    box-shadow: 0 18px 40px var(--shadow), 0 2px 0 rgba(0,0,0,0.06) inset;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding: 30px 22px 22px;
+    cursor:pointer;
+    user-select:none;
+    transition: transform 0.15s ease;
+  }
+  .card:active{ transform: scale(0.985); }
+
+  .ring-holes{
+    position:absolute;
+    top:14px; left:0; right:0;
+    display:flex;
+    justify-content:center;
+    gap: 46px;
+  }
+  .ring-holes span{
+    width:14px; height:14px;
+    border-radius:50%;
+    background: var(--bg-deep);
+    box-shadow: 0 0 0 3px var(--ring, #C9A76B), inset 0 2px 3px rgba(0,0,0,0.35);
+  }
+
+  .cat-tag{
+    font-size:0.68rem;
+    font-weight:800;
+    letter-spacing:0.04em;
+    padding:4px 12px;
+    border-radius:999px;
+    margin-top:40px;
+  }
+  .cat-tag.part{ background: rgba(100,85,166,0.14); color: var(--indigo-deep); }
+  .cat-tag.word{ background: rgba(225,86,63,0.1); color: var(--coral-deep); }
+
+  .card-word{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size: clamp(2rem, 10vw, 2.7rem);
+    color: var(--ink);
+    text-align:center;
+    line-height:1.05;
+    margin-top: 18px;
+  }
+  .card-word.part-form{ color: var(--indigo-deep); }
+  .card-word .hl{ color: var(--indigo-deep); }
+  .card-kana{
+    font-size: 0.95rem;
+    font-weight:500;
+    color: var(--coral-deep);
+    margin-top:10px;
+    letter-spacing:0.02em;
+  }
+  .speak-dot{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:26px; height:26px;
+    border-radius:50%;
+    background: rgba(225,86,63,0.1);
+    margin-top:16px;
+  }
+  .speak-dot svg{ width:14px; height:14px; }
+
+  .card-divider{
+    width:56px; height:2px;
+    background: var(--line);
+    margin: 18px 0;
+    border-radius:2px;
+  }
+  .card-meaning{
+    font-size: clamp(1.25rem, 5.6vw, 1.45rem);
+    font-weight:700;
+    color: var(--ink);
+    text-align:center;
+  }
+  .card-note{
+    font-size:0.72rem;
+    color: var(--ink-soft);
+    text-align:center;
+    margin-top:10px;
+    line-height:1.6;
+    max-width: 240px;
+  }
+  .card-hint{
+    margin-top:auto;
+    font-size:0.68rem;
+    color: var(--ink-soft);
+    opacity:0.65;
+  }
+
+  .judge-row{
+    position:absolute;
+    left:18px; right:18px; bottom:18px;
+    display:flex;
+    gap:10px;
+  }
+  .judge-btn{
+    flex:1;
+    border:none;
+    padding: 11px 0;
+    border-radius: 999px;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-weight:700;
+    font-size:0.8rem;
+    color:#fff;
+  }
+  .judge-btn.no{ background: var(--ink-soft); }
+  .judge-btn.yes{ background: var(--mint); }
+  .judge-btn:active{ transform: translateY(1px); }
+  .judge-btn:disabled{ opacity:0.4; }
+
+  /* Start overlay */
+  .start-overlay{
+    position:fixed; inset:0;
+    background: radial-gradient(120% 140% at 50% -10%, var(--bg) 0%, var(--bg-deep) 100%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    padding: 24px;
+    text-align:center;
+    z-index: 50;
+  }
+  .start-overlay .glyph{
+    font-family:'Fraunces', serif;
+    font-size: 2.4rem;
+    color:#F3ECD9;
+    font-weight:600;
+  }
+  .start-overlay p{
+    color: rgba(243,236,217,0.7);
+    font-size:0.85rem;
+    max-width:280px;
+    line-height:1.6;
+    margin:0;
+  }
+  .start-btn{
+    border:none;
+    padding: 15px 42px;
+    border-radius:999px;
+    background: var(--indigo);
+    color:#fff;
+    font-weight:800;
+    font-size:1rem;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    box-shadow: 0 10px 24px rgba(100,85,166,0.4);
+  }
+  .start-btn:active{ transform: translateY(1px); }
+
+  /* Celebration */
+  .celebrate{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; text-align:center; flex:1; padding: 20px;
+  }
+  .celebrate .glyph{ font-size: 3rem; }
+  .celebrate h2{
+    font-family:'Fraunces', serif;
+    color:#F3ECD9;
+    font-weight:600;
+    font-size:1.4rem;
+    margin:0;
+  }
+  .celebrate p{
+    color: rgba(243,236,217,0.65);
+    font-size:0.85rem;
+    max-width:260px;
+    line-height:1.6;
+    margin:0;
+  }
+
+  /* Bottom bar */
+  .bottom-bar{
+    display:flex;
+    justify-content:center;
+    gap: 14px;
+    padding-top: 6px;
+  }
+  .bar-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:52px; height:52px;
+    border-radius:16px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    color:#F3ECD9;
+    position:relative;
+  }
+  .bar-btn svg{ width:22px; height:22px; }
+  .bar-btn.off{ color: rgba(243,236,217,0.35); }
+
+  /* Modal */
+  .modal-back{
+    position:fixed; inset:0;
+    background: rgba(10,20,16,0.55);
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:80;
+    opacity:0; pointer-events:none;
+    transition: opacity 0.2s ease;
+  }
+  .modal-back.open{ opacity:1; pointer-events:auto; }
+  .modal-sheet{
+    width:100%;
+    max-width:440px;
+    background: var(--card);
+    border-radius: 22px 22px 0 0;
+    padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+    max-height: 78vh;
+    overflow-y:auto;
+    transform: translateY(16px);
+    transition: transform 0.2s ease;
+  }
+  .modal-back.open .modal-sheet{ transform: translateY(0); }
+  .modal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .modal-head h3{
+    font-family:'Fraunces', serif;
+    font-size:1.15rem;
+    font-weight:600;
+    margin:0;
+    color: var(--ink);
+  }
+  .modal-close{
+    border:none; background:rgba(34,48,58,0.08);
+    width:32px; height:32px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color: var(--ink);
+  }
+
+  .setting-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .setting-row:last-child{ border-bottom:none; }
+  .setting-label{ font-size:0.88rem; font-weight:700; color: var(--ink); }
+  .setting-sub{ font-size:0.72rem; color: var(--ink-soft); margin-top:2px; }
+
+  .switch{
+    width:46px; height:27px;
+    border-radius:999px;
+    background: rgba(34,48,58,0.18);
+    position:relative;
+    border:none;
+    flex-shrink:0;
+  }
+  .switch.on{ background: var(--mint); }
+  .switch::after{
+    content:'';
+    position:absolute;
+    top:3px; left:3px;
+    width:21px; height:21px;
+    border-radius:50%;
+    background:#fff;
+    transition: left 0.15s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .switch.on::after{ left:22px; }
+
+  /* TOC */
+  .toc-group{ margin-bottom: 18px; }
+  .toc-group:last-child{ margin-bottom:0; }
+  .toc-group-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:8px;
+  }
+  .toc-group-title{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:0.98rem;
+    color: var(--ink);
+  }
+  .toc-group-title small{
+    display:block;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:0.66rem;
+    color: var(--ink-soft);
+    font-weight:500;
+    margin-top:1px;
+  }
+  .toc-group-count{
+    font-size:0.7rem;
+    font-weight:800;
+    color: var(--mint);
+    background: rgba(78,156,130,0.12);
+    border-radius:999px;
+    padding:3px 10px;
+  }
+  .toc-part-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 10px 12px;
+    border-radius:12px;
+    margin-bottom:6px;
+    background:#fff;
+    border:1px solid var(--line);
+  }
+  .toc-part-row:last-child{ margin-bottom:0; }
+  .toc-part-form{ font-family:'Fraunces', serif; font-weight:600; font-size:0.95rem; color: var(--ink); }
+  .toc-part-meaning{ font-size:0.68rem; color: var(--ink-soft); margin-top:1px; }
+  .toc-status{
+    flex-shrink:0;
+    font-size:0.68rem;
+    font-weight:800;
+    padding:5px 11px;
+    border-radius:999px;
+  }
+  .toc-status.done{ background: rgba(78,156,130,0.14); color: var(--mint); }
+  .toc-status.todo{ background: rgba(34,48,58,0.08); color: var(--ink-soft); }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+
+  /* ---- Badge toast ---- */
+  .badge-toast{
+    position:fixed;
+    left:50%; top:16%;
+    transform:translate(-50%,10px) scale(0.85);
+    z-index:300;
+    padding:14px 24px;
+    border-radius:18px;
+    color:#fff;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-weight:800;
+    font-size:0.95rem;
+    text-align:center;
+    white-space:nowrap;
+    opacity:0;
+    pointer-events:none;
+    background: linear-gradient(135deg, var(--indigo), var(--indigo-deep));
+    box-shadow: 0 10px 30px rgba(100,85,166,0.4);
+    animation: badgePop 2.1s cubic-bezier(.2,.8,.3,1) forwards;
+  }
+  .badge-toast .bt-title{ font-size:1.05rem; }
+  .badge-toast .bt-sub{ font-size:0.68rem; font-weight:600; opacity:0.85; margin-top:2px; }
+  .badge-toast.tier-3, .badge-toast.tier-4{
+    background: linear-gradient(135deg, var(--indigo), var(--mustard));
+    box-shadow: 0 12px 34px rgba(226,169,59,0.45);
+  }
+  .badge-toast.tier-5, .badge-toast.tier-6{
+    background: linear-gradient(135deg, var(--mint), var(--mustard), var(--indigo));
+    box-shadow: 0 14px 38px rgba(78,156,130,0.5);
+    font-size:1.02rem;
+  }
+  .badge-toast.tier-group{
+    background: linear-gradient(135deg, var(--mint), var(--mustard), var(--coral), var(--indigo));
+    box-shadow: 0 16px 46px rgba(226,169,59,0.55);
+    font-size:1.1rem;
+    padding:18px 30px;
+  }
+  @keyframes badgePop{
+    0%{ opacity:0; transform:translate(-50%,14px) scale(0.8); }
+    14%{ opacity:1; transform:translate(-50%,-6px) scale(1.08); }
+    22%{ transform:translate(-50%,-6px) scale(1); }
+    82%{ opacity:1; }
+    100%{ opacity:0; transform:translate(-50%,-22px) scale(0.96); }
+  }
+  .confetti-piece{
+    position:fixed;
+    left:50%; top:20%;
+    width:7px; height:7px;
+    border-radius:2px;
+    z-index:299;
+    pointer-events:none;
+    animation: confettiFly 1.5s ease-out forwards;
+  }
+  @keyframes confettiFly{
+    0%{ opacity:1; transform:translate(0,0) rotate(0deg); }
+    100%{ opacity:0; transform:translate(var(--dx), var(--dy)) rotate(var(--rot)); }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <div class="app-head">
+    <div class="app-title">語源ラボ<small>パーツで読み解く英単語</small></div>
+    <div class="progress-pill" id="progressPill"></div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="deck-shadow d2"></div>
+    <div class="deck-shadow d1"></div>
+    <div class="card" id="card"></div>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="bar-btn" id="soundBtn" aria-label="音声">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6h4l5 5V4L7 9H3z"></path><path d="M16 9a4 4 0 010 6M19 6a8 8 0 010 12"></path></svg>
+    </button>
+    <button class="bar-btn" id="tocBtn" aria-label="目次">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h10"></path></svg>
+    </button>
+    <button class="bar-btn" id="settingsBtn" aria-label="設定">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+    </button>
+  </div>
+</div>
+
+<div class="start-overlay" id="startOverlay">
+  <div class="glyph">🔬</div>
+  <p>接頭辞・語根・接尾辞という「パーツ」の意味を知れば、<br>初めて見る単語でも意味を推測できるようになります。</p>
+  <button class="start-btn" id="startBtn">はじめる</button>
+</div>
+
+<div class="modal-back" id="settingsModal">
+  <div class="modal-sheet">
+    <div class="modal-head">
+      <h3>設定</h3>
+      <button class="modal-close" data-close="settingsModal">✕</button>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">発音を読み上げる</div>
+        <div class="setting-sub" id="soundSub">応用単語が出るたびに音声が鳴ります</div>
+      </div>
+      <button class="switch" id="soundSwitch"></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="tocModal">
+  <div class="modal-sheet">
+    <div class="modal-head">
+      <h3>目次（復習用）</h3>
+      <button class="modal-close" data-close="tocModal">✕</button>
+    </div>
+    <div id="tocList"></div>
+  </div>
+</div>
+
+<script>
+window.addEventListener('error', function(e){
+  try{
+    var overlay = document.getElementById('startOverlay');
+    if(overlay && !overlay.querySelector('.js-err')){
+      var msg = document.createElement('p');
+      msg.className = 'js-err';
+      msg.style.color = '#ffb4a8';
+      msg.style.fontSize = '0.68rem';
+      msg.style.marginTop = '4px';
+      msg.textContent = 'エラー: ' + (e && e.message ? e.message : '不明なエラー');
+      overlay.appendChild(msg);
+    }
+  }catch(err){}
+});
+(function(){
+  /* ============ サンプルデータ（2グループ・8パーツ） ============ */
+  var GROUPS = [
+    {
+      id:'neg', title:'否定', cat:'接頭辞',
+      parts:[
+        { id:'un', form:'un-', variants:['un'], type:'prefix',
+          meaning:'〜でない、〜しない（否定）',
+          note:'形容詞・動詞につく、最も基本的で使用頻度の高い否定の接頭辞。',
+          words:[
+            {en:'unhappy', kana:'アンハッピー', ja:'幸せでない'},
+            {en:'unable', kana:'アンエイブル', ja:'できない'},
+            {en:'unfair', kana:'アンフェア', ja:'不公平な'},
+            {en:'unlock', kana:'アンロック', ja:'鍵を開ける'},
+            {en:'unknown', kana:'アンノウン', ja:'未知の'},
+            {en:'undo', kana:'アンドゥー', ja:'元に戻す'}
+          ]
+        },
+        { id:'dis', form:'dis-', variants:['dis'], type:'prefix',
+          meaning:'〜しない、反対に、離れて（否定・分離）',
+          note:'「反対の動作」や「分離」のニュアンスを持つ否定の接頭辞。',
+          words:[
+            {en:'disagree', kana:'ディスアグリー', ja:'反対する'},
+            {en:'disappear', kana:'ディスアピア', ja:'消える'},
+            {en:'dislike', kana:'ディスライク', ja:'嫌う'},
+            {en:'disconnect', kana:'ディスコネクト', ja:'切断する'},
+            {en:'discomfort', kana:'ディスカンフォート', ja:'不快感'}
+          ]
+        },
+        { id:'inim', form:'in-/im-/il-/ir-', variants:['in','im','il','ir'], type:'prefix',
+          meaning:'〜でない（否定）',
+          note:'後に続く文字の発音に合わせて im-（bやpの前）、il-（lの前）、ir-（rの前）に変化する。',
+          words:[
+            {en:'incorrect', kana:'インコレクト', ja:'間違った'},
+            {en:'impossible', kana:'インポシブル', ja:'不可能な'},
+            {en:'illegal', kana:'イリーガル', ja:'違法な'},
+            {en:'irregular', kana:'イレギュラー', ja:'不規則な'},
+            {en:'independent', kana:'インディペンデント', ja:'独立した'}
+          ]
+        },
+        { id:'non', form:'non-', variants:['non'], type:'prefix',
+          meaning:'〜でない（中立的な否定）',
+          note:'良い悪いのニュアンスを含まず、単に「〜ではない」ことを表す。',
+          words:[
+            {en:'nonsense', kana:'ナンセンス', ja:'無意味なこと'},
+            {en:'nonstop', kana:'ノンストップ', ja:'止まらない'},
+            {en:'nonfiction', kana:'ノンフィクション', ja:'ノンフィクション'},
+            {en:'nonprofit', kana:'ノンプロフィット', ja:'非営利の'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'place', title:'位置・方向', cat:'接頭辞',
+      parts:[
+        { id:'sub', form:'sub-', variants:['sub'], type:'prefix',
+          meaning:'下に、副次的な',
+          note:'「〜の下」「メインではなく補助的な」というイメージ。',
+          words:[
+            {en:'submarine', kana:'サブマリーン', ja:'潜水艦'},
+            {en:'subway', kana:'サブウェイ', ja:'地下鉄'},
+            {en:'subtitle', kana:'サブタイトル', ja:'字幕'},
+            {en:'submit', kana:'サブミット', ja:'提出する'}
+          ]
+        },
+        { id:'inter', form:'inter-', variants:['inter'], type:'prefix',
+          meaning:'〜の間、相互に',
+          note:'2つ以上のものの「間」でのやり取りを表す。',
+          words:[
+            {en:'international', kana:'インターナショナル', ja:'国際的な'},
+            {en:'internet', kana:'インターネット', ja:'インターネット'},
+            {en:'interact', kana:'インタラクト', ja:'相互に作用する'},
+            {en:'interview', kana:'インタビュー', ja:'面接'}
+          ]
+        },
+        { id:'trans', form:'trans-', variants:['trans'], type:'prefix',
+          meaning:'越えて、横切って、変化して',
+          note:'ある場所や状態から別の場所・状態へ「移す・越える」動きを表す。',
+          words:[
+            {en:'transport', kana:'トランスポート', ja:'輸送する'},
+            {en:'translate', kana:'トランスレイト', ja:'翻訳する'},
+            {en:'transform', kana:'トランスフォーム', ja:'変形させる'},
+            {en:'transfer', kana:'トランスファー', ja:'移す'}
+          ]
+        },
+        { id:'ex', form:'ex-', variants:['ex'], type:'prefix',
+          meaning:'外へ、元の',
+          note:'「内から外へ」向かう動き、または「以前の」状態を表す。',
+          words:[
+            {en:'exit', kana:'エグジット', ja:'出口'},
+            {en:'export', kana:'エクスポート', ja:'輸出する'},
+            {en:'express', kana:'エクスプレス', ja:'表現する'},
+            {en:'exchange', kana:'エクスチェンジ', ja:'交換する'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'beforeafter', title:'前後', cat:'接頭辞',
+      parts:[
+        { id:'pre', form:'pre-', variants:['pre'], type:'prefix',
+          meaning:'前もって、〜の前に',
+          note:'時間的・位置的に「前」を表す、非常によく使われる接頭辞。',
+          words:[
+            {en:'preview', kana:'プレビュー', ja:'下見、試写'},
+            {en:'predict', kana:'プリディクト', ja:'予測する'},
+            {en:'prepare', kana:'プリペア', ja:'準備する'},
+            {en:'prevent', kana:'プリベント', ja:'防ぐ'},
+            {en:'preschool', kana:'プリスクール', ja:'幼稚園'}
+          ]
+        },
+        { id:'post', form:'post-', variants:['post'], type:'prefix',
+          meaning:'〜の後に',
+          note:'「post」はもともと「後」を意味するラテン語に由来する。',
+          words:[
+            {en:'postpone', kana:'ポストポーン', ja:'延期する'},
+            {en:'postwar', kana:'ポストウォー', ja:'戦後の'},
+            {en:'postgraduate', kana:'ポストグラジュエイト', ja:'大学院の'},
+            {en:'postscript', kana:'ポストスクリプト', ja:'追伸'}
+          ]
+        },
+        { id:'fore', form:'fore-', variants:['fore'], type:'prefix',
+          meaning:'前もって、前方の',
+          note:'「あらかじめ」「前部」というイメージを持つ。',
+          words:[
+            {en:'forecast', kana:'フォーキャスト', ja:'予報する'},
+            {en:'foresee', kana:'フォーシー', ja:'予見する'},
+            {en:'forehead', kana:'フォーヘッド', ja:'額'},
+            {en:'foreground', kana:'フォーグラウンド', ja:'前景'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'together', title:'一緒に・共に', cat:'接頭辞',
+      parts:[
+        { id:'co', form:'co-/com-/con-', variants:['com','con','co'], type:'prefix',
+          meaning:'共に、一緒に',
+          note:'後に続く音によって co-, com-, con- と形を変える、「共同」を表す接頭辞。',
+          words:[
+            {en:'cooperate', kana:'コーオペレイト', ja:'協力する'},
+            {en:'combine', kana:'コンバイン', ja:'結合する'},
+            {en:'connect', kana:'コネクト', ja:'つなげる'},
+            {en:'coexist', kana:'コーイグジスト', ja:'共存する'},
+            {en:'companion', kana:'コンパニオン', ja:'仲間'}
+          ]
+        },
+        { id:'syn', form:'syn-/sym-', variants:['syn','sym'], type:'prefix',
+          meaning:'同じ、共に',
+          note:'ギリシャ語由来で「同時に」「共に」を表す。',
+          words:[
+            {en:'symphony', kana:'シンフォニー', ja:'交響曲'},
+            {en:'synonym', kana:'シノニム', ja:'同義語'},
+            {en:'sympathy', kana:'シンパシー', ja:'同情'},
+            {en:'synchronize', kana:'シンクロナイズ', ja:'同期させる'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'number', title:'数', cat:'接頭辞',
+      parts:[
+        { id:'mono', form:'mono-/uni-', variants:['mono','uni'], type:'prefix',
+          meaning:'一つの、単一の',
+          note:'monoはギリシャ語、uniはラテン語由来でどちらも「1」を表す。',
+          words:[
+            {en:'monorail', kana:'モノレール', ja:'モノレール'},
+            {en:'monotone', kana:'モノトーン', ja:'単調な'},
+            {en:'unique', kana:'ユニーク', ja:'唯一の'},
+            {en:'uniform', kana:'ユニフォーム', ja:'制服'}
+          ]
+        },
+        { id:'bi', form:'bi-', variants:['bi'], type:'prefix',
+          meaning:'二つの、2倍の',
+          note:'「2」を表す接頭辞。',
+          words:[
+            {en:'bicycle', kana:'バイシクル', ja:'自転車'},
+            {en:'bilingual', kana:'バイリンガル', ja:'2言語を話す'},
+            {en:'biweekly', kana:'バイウィークリー', ja:'隔週の'},
+            {en:'bimonthly', kana:'バイマンスリー', ja:'隔月の'}
+          ]
+        },
+        { id:'tri', form:'tri-', variants:['tri'], type:'prefix',
+          meaning:'三つの',
+          note:'「3」を表す接頭辞。',
+          words:[
+            {en:'triangle', kana:'トライアングル', ja:'三角形'},
+            {en:'tricycle', kana:'トライシクル', ja:'三輪車'},
+            {en:'triple', kana:'トリプル', ja:'3倍の'},
+            {en:'trio', kana:'トリオ', ja:'三人組'}
+          ]
+        },
+        { id:'multi', form:'multi-/poly-', variants:['multi','poly'], type:'prefix',
+          meaning:'多くの',
+          note:'multiはラテン語、polyはギリシャ語由来でどちらも「多数」を表す。',
+          words:[
+            {en:'multiple', kana:'マルチプル', ja:'複数の'},
+            {en:'multicultural', kana:'マルチカルチュラル', ja:'多文化の'},
+            {en:'polygon', kana:'ポリゴン', ja:'多角形'},
+            {en:'polyglot', kana:'ポリグロット', ja:'多言語話者'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'against', title:'反対・再び', cat:'接頭辞',
+      parts:[
+        { id:'anti', form:'anti-', variants:['anti'], type:'prefix',
+          meaning:'反対の、抗〜',
+          note:'「〜に対抗する」ものを表す接頭辞。',
+          words:[
+            {en:'antivirus', kana:'アンチウイルス', ja:'ウイルス対策の'},
+            {en:'antisocial', kana:'アンチソーシャル', ja:'反社会的な'},
+            {en:'antibody', kana:'アンチボディ', ja:'抗体'},
+            {en:'antibiotic', kana:'アンチバイオティック', ja:'抗生物質'}
+          ]
+        },
+        { id:'counter', form:'counter-', variants:['counter'], type:'prefix',
+          meaning:'反対に、逆に',
+          note:'「対抗」「反対方向」というニュアンスを表す。',
+          words:[
+            {en:'counterattack', kana:'カウンターアタック', ja:'反撃'},
+            {en:'counterpart', kana:'カウンターパート', ja:'対応するもの'},
+            {en:'counterclockwise', kana:'カウンタークロックワイズ', ja:'反時計回りの'}
+          ]
+        },
+        { id:'re', form:'re-', variants:['re'], type:'prefix',
+          meaning:'再び、後ろへ',
+          note:'「もう一度」や「元に戻る」動作を表す、非常によく使われる接頭辞。',
+          words:[
+            {en:'rewrite', kana:'リライト', ja:'書き直す'},
+            {en:'return', kana:'リターン', ja:'戻る'},
+            {en:'rebuild', kana:'リビルド', ja:'再建する'},
+            {en:'replay', kana:'リプレイ', ja:'再生する'},
+            {en:'review', kana:'レビュー', ja:'見直す'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'updown', title:'上下・超える', cat:'接頭辞',
+      parts:[
+        { id:'super', form:'super-/over-', variants:['super','over'], type:'prefix',
+          meaning:'上に、超えて',
+          note:'「基準を超える」「上位の」というイメージを持つ。',
+          words:[
+            {en:'superman', kana:'スーパーマン', ja:'超人'},
+            {en:'supermarket', kana:'スーパーマーケット', ja:'スーパーマーケット'},
+            {en:'overcome', kana:'オーバーカム', ja:'克服する'},
+            {en:'overweight', kana:'オーバーウェイト', ja:'太り過ぎの'}
+          ]
+        },
+        { id:'under', form:'under-', variants:['under'], type:'prefix',
+          meaning:'下に、不足して',
+          note:'「基準より下」「不十分」であることを表す。',
+          words:[
+            {en:'underground', kana:'アンダーグラウンド', ja:'地下の'},
+            {en:'underline', kana:'アンダーライン', ja:'下線を引く'},
+            {en:'understand', kana:'アンダースタンド', ja:'理解する'},
+            {en:'underestimate', kana:'アンダーエスティメイト', ja:'過小評価する'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'see', title:'見る', cat:'語根',
+      parts:[
+        { id:'vis', form:'vis-/vid-', variants:['vis','vid'], type:'root',
+          meaning:'見る',
+          note:'ラテン語 videre（見る）に由来する語根。',
+          words:[
+            {en:'visible', kana:'ヴィジブル', ja:'目に見える'},
+            {en:'television', kana:'テレビジョン', ja:'テレビ'},
+            {en:'video', kana:'ヴィデオ', ja:'映像'},
+            {en:'vision', kana:'ヴィジョン', ja:'視力、展望'}
+          ]
+        },
+        { id:'spect', form:'spect-/spec-', variants:['spect','spec'], type:'root',
+          meaning:'見る、眺める',
+          note:'ラテン語 specere（見る）に由来する。',
+          words:[
+            {en:'inspect', kana:'インスペクト', ja:'検査する'},
+            {en:'respect', kana:'リスペクト', ja:'尊敬する'},
+            {en:'spectator', kana:'スペクテイター', ja:'観客'},
+            {en:'spectacle', kana:'スペクタクル', ja:'見もの'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'carry', title:'送る・運ぶ', cat:'語根',
+      parts:[
+        { id:'port', form:'port-', variants:['port'], type:'root',
+          meaning:'運ぶ',
+          note:'ラテン語 portare（運ぶ）に由来する。',
+          words:[
+            {en:'transport', kana:'トランスポート', ja:'輸送する'},
+            {en:'import', kana:'インポート', ja:'輸入する'},
+            {en:'export', kana:'エクスポート', ja:'輸出する'},
+            {en:'portable', kana:'ポータブル', ja:'持ち運びできる'}
+          ]
+        },
+        { id:'mit', form:'mit-/mis-', variants:['mit','mis'], type:'root',
+          meaning:'送る',
+          note:'ラテン語 mittere（送る）に由来する。',
+          words:[
+            {en:'submit', kana:'サブミット', ja:'提出する'},
+            {en:'permit', kana:'パーミット', ja:'許可する'},
+            {en:'transmit', kana:'トランスミット', ja:'伝達する'},
+            {en:'mission', kana:'ミッション', ja:'使命'}
+          ]
+        },
+        { id:'duc', form:'duc-/duct-', variants:['duc','duct'], type:'root',
+          meaning:'導く',
+          note:'ラテン語 ducere（導く）に由来する。',
+          words:[
+            {en:'introduce', kana:'イントロデュース', ja:'紹介する'},
+            {en:'produce', kana:'プロデュース', ja:'生産する'},
+            {en:'conductor', kana:'コンダクター', ja:'指揮者'},
+            {en:'education', kana:'エデュケーション', ja:'教育'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'say', title:'言う・呼ぶ', cat:'語根',
+      parts:[
+        { id:'dict', form:'dict-', variants:['dict'], type:'root',
+          meaning:'言う',
+          note:'ラテン語 dicere（言う）に由来する。',
+          words:[
+            {en:'dictionary', kana:'ディクショナリー', ja:'辞書'},
+            {en:'predict', kana:'プリディクト', ja:'予測する'},
+            {en:'dictate', kana:'ディクテイト', ja:'口述する'}
+          ]
+        },
+        { id:'voc', form:'voc-/vok-', variants:['voc','vok'], type:'root',
+          meaning:'声、呼ぶ',
+          note:'ラテン語 vocare（呼ぶ）に由来する。',
+          words:[
+            {en:'vocabulary', kana:'ボキャブラリー', ja:'語彙'},
+            {en:'vocal', kana:'ヴォーカル', ja:'声の'},
+            {en:'invoke', kana:'インヴォーク', ja:'呼び起こす'},
+            {en:'advocate', kana:'アドヴォケイト', ja:'主張する'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'make', title:'作る', cat:'語根',
+      parts:[
+        { id:'fac', form:'fac-/fact-/fic-', variants:['fact','fac','fic'], type:'root',
+          meaning:'作る、行う',
+          note:'ラテン語 facere（作る・行う）に由来する。',
+          words:[
+            {en:'factory', kana:'ファクトリー', ja:'工場'},
+            {en:'fact', kana:'ファクト', ja:'事実'},
+            {en:'manufacture', kana:'マニュファクチャー', ja:'製造する'},
+            {en:'artificial', kana:'アーティフィシャル', ja:'人工の'}
+          ]
+        },
+        { id:'gen', form:'gen-', variants:['gen'], type:'root',
+          meaning:'生む、生じる',
+          note:'ラテン語 genus（生まれ）に由来する。',
+          words:[
+            {en:'generate', kana:'ジェネレイト', ja:'生み出す'},
+            {en:'generation', kana:'ジェネレーション', ja:'世代'},
+            {en:'genetic', kana:'ジェネティック', ja:'遺伝的な'},
+            {en:'gene', kana:'ジーン', ja:'遺伝子'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'write', title:'書く', cat:'語根',
+      parts:[
+        { id:'scrib', form:'scrib-/script-', variants:['script','scrib'], type:'root',
+          meaning:'書く',
+          note:'ラテン語 scribere（書く）に由来する。',
+          words:[
+            {en:'describe', kana:'ディスクライブ', ja:'説明する'},
+            {en:'subscribe', kana:'サブスクライブ', ja:'定期購読する'},
+            {en:'script', kana:'スクリプト', ja:'台本'},
+            {en:'manuscript', kana:'マニュスクリプト', ja:'原稿'}
+          ]
+        },
+        { id:'graph', form:'graph-', variants:['graph'], type:'root',
+          meaning:'書く、描く',
+          note:'ギリシャ語 graphein（書く）に由来する。',
+          words:[
+            {en:'photograph', kana:'フォトグラフ', ja:'写真'},
+            {en:'paragraph', kana:'パラグラフ', ja:'段落'},
+            {en:'autograph', kana:'オートグラフ', ja:'サイン'},
+            {en:'graphic', kana:'グラフィック', ja:'図式の'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'hold', title:'つかむ・持つ', cat:'語根',
+      parts:[
+        { id:'tain', form:'tain-/ten-', variants:['tain','ten'], type:'root',
+          meaning:'保つ、持つ',
+          note:'ラテン語 tenere（持つ）に由来する。',
+          words:[
+            {en:'maintain', kana:'メインテイン', ja:'維持する'},
+            {en:'contain', kana:'コンテイン', ja:'含む'},
+            {en:'retain', kana:'リテイン', ja:'保持する'},
+            {en:'tenant', kana:'テナント', ja:'借家人'}
+          ]
+        },
+        { id:'cap', form:'cap-/cept-', variants:['cept','cap'], type:'root',
+          meaning:'つかむ、取る',
+          note:'ラテン語 capere（つかむ）に由来する。',
+          words:[
+            {en:'capture', kana:'キャプチャー', ja:'捕らえる'},
+            {en:'accept', kana:'アクセプト', ja:'受け入れる'},
+            {en:'except', kana:'イクセプト', ja:'〜を除いて'},
+            {en:'concept', kana:'コンセプト', ja:'概念'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'life', title:'生死・動き', cat:'語根',
+      parts:[
+        { id:'viv', form:'viv-/vit-', variants:['viv','vit'], type:'root',
+          meaning:'生きる、生命',
+          note:'ラテン語 vivere（生きる）に由来する。',
+          words:[
+            {en:'survive', kana:'サヴァイヴ', ja:'生き残る'},
+            {en:'vivid', kana:'ヴィヴィッド', ja:'鮮やかな'},
+            {en:'vitamin', kana:'ヴァイタミン', ja:'ビタミン'},
+            {en:'vital', kana:'ヴァイタル', ja:'不可欠な'}
+          ]
+        },
+        { id:'mov', form:'mov-/mot-', variants:['mov','mot'], type:'root',
+          meaning:'動く',
+          note:'ラテン語 movere（動く）に由来する。',
+          words:[
+            {en:'move', kana:'ムーヴ', ja:'動く'},
+            {en:'movement', kana:'ムーヴメント', ja:'動き'},
+            {en:'motion', kana:'モーション', ja:'動き'},
+            {en:'motivate', kana:'モーティベイト', ja:'動機付ける'},
+            {en:'remove', kana:'リムーヴ', ja:'取り除く'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'person', title:'人を表す', cat:'接尾辞',
+      parts:[
+        { id:'er', form:'-er/-or', variants:['er','or'], type:'suffix',
+          meaning:'〜する人、〜する物',
+          note:'動詞について「〜する人/物」を表す、最も基本的な接尾辞。',
+          words:[
+            {en:'teacher', kana:'ティーチャー', ja:'先生'},
+            {en:'worker', kana:'ワーカー', ja:'労働者'},
+            {en:'actor', kana:'アクター', ja:'俳優'},
+            {en:'visitor', kana:'ヴィジター', ja:'訪問者'}
+          ]
+        },
+        { id:'ist', form:'-ist', variants:['ist'], type:'suffix',
+          meaning:'〜する人、〜主義者',
+          note:'職業や主義を持つ人を表す。',
+          words:[
+            {en:'artist', kana:'アーティスト', ja:'芸術家'},
+            {en:'scientist', kana:'サイエンティスト', ja:'科学者'},
+            {en:'pianist', kana:'ピアニスト', ja:'ピアニスト'},
+            {en:'tourist', kana:'ツーリスト', ja:'旅行者'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'nounize', title:'名詞化（状態・性質）', cat:'接尾辞',
+      parts:[
+        { id:'tion', form:'-tion/-sion', variants:['tion','sion'], type:'suffix',
+          meaning:'〜すること、〜の状態',
+          note:'動詞を「〜すること」という名詞に変える、非常によく使われる接尾辞。',
+          words:[
+            {en:'education', kana:'エデュケーション', ja:'教育'},
+            {en:'decision', kana:'ディシジョン', ja:'決定'},
+            {en:'action', kana:'アクション', ja:'行動'},
+            {en:'discussion', kana:'ディスカッション', ja:'議論'}
+          ]
+        },
+        { id:'ment', form:'-ment', variants:['ment'], type:'suffix',
+          meaning:'〜すること、〜の結果',
+          note:'動詞について行為の結果や状態を表す名詞を作る。',
+          words:[
+            {en:'agreement', kana:'アグリーメント', ja:'同意'},
+            {en:'movement', kana:'ムーヴメント', ja:'動き'},
+            {en:'government', kana:'ガヴァメント', ja:'政府'},
+            {en:'development', kana:'ディヴェロップメント', ja:'発展'}
+          ]
+        },
+        { id:'ness', form:'-ness', variants:['ness'], type:'suffix',
+          meaning:'〜であること（性質・状態）',
+          note:'形容詞について抽象的な性質や状態を表す名詞を作る。',
+          words:[
+            {en:'happiness', kana:'ハピネス', ja:'幸福'},
+            {en:'kindness', kana:'カインドネス', ja:'親切'},
+            {en:'darkness', kana:'ダークネス', ja:'暗闇'},
+            {en:'sadness', kana:'サッドネス', ja:'悲しみ'}
+          ]
+        },
+        { id:'ity', form:'-ity', variants:['ity'], type:'suffix',
+          meaning:'〜であること（性質）',
+          note:'形容詞について性質を表す名詞を作る、フォーマルな響きを持つ。',
+          words:[
+            {en:'ability', kana:'アビリティ', ja:'能力'},
+            {en:'reality', kana:'リアリティ', ja:'現実'},
+            {en:'activity', kana:'アクティビティ', ja:'活動'},
+            {en:'curiosity', kana:'キュリオシティ', ja:'好奇心'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'adjize', title:'形容詞化', cat:'接尾辞',
+      parts:[
+        { id:'ful', form:'-ful', variants:['ful'], type:'suffix',
+          meaning:'〜に満ちた',
+          note:'名詞について「〜がいっぱいの」という意味の形容詞を作る。',
+          words:[
+            {en:'beautiful', kana:'ビューティフル', ja:'美しい'},
+            {en:'useful', kana:'ユースフル', ja:'役に立つ'},
+            {en:'careful', kana:'ケアフル', ja:'注意深い'},
+            {en:'colorful', kana:'カラフル', ja:'色彩豊かな'}
+          ]
+        },
+        { id:'less', form:'-less', variants:['less'], type:'suffix',
+          meaning:'〜がない',
+          note:'-fulの反対で「〜が欠けている」ことを表す。',
+          words:[
+            {en:'careless', kana:'ケアレス', ja:'不注意な'},
+            {en:'useless', kana:'ユースレス', ja:'役に立たない'},
+            {en:'homeless', kana:'ホームレス', ja:'家のない'},
+            {en:'endless', kana:'エンドレス', ja:'終わりのない'}
+          ]
+        },
+        { id:'able', form:'-able/-ible', variants:['able','ible'], type:'suffix',
+          meaning:'〜できる',
+          note:'「〜することが可能」という意味の形容詞を作る。',
+          words:[
+            {en:'readable', kana:'リーダブル', ja:'読みやすい'},
+            {en:'comfortable', kana:'コンフォータブル', ja:'快適な'},
+            {en:'possible', kana:'ポシブル', ja:'可能な'},
+            {en:'visible', kana:'ヴィジブル', ja:'目に見える'}
+          ]
+        },
+        { id:'ous', form:'-ous', variants:['ous'], type:'suffix',
+          meaning:'〜に満ちた、〜の性質を持つ',
+          note:'名詞について「〜の性質を帯びた」形容詞を作る。',
+          words:[
+            {en:'dangerous', kana:'デインジャラス', ja:'危険な'},
+            {en:'famous', kana:'フェイマス', ja:'有名な'},
+            {en:'curious', kana:'キュリアス', ja:'好奇心旺盛な'},
+            {en:'nervous', kana:'ナーヴァス', ja:'緊張した'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'verbize', title:'動詞化', cat:'接尾辞',
+      parts:[
+        { id:'ize', form:'-ize/-ise', variants:['ize','ise'], type:'suffix',
+          meaning:'〜化する',
+          note:'名詞や形容詞を「〜にする」という動詞に変える。',
+          words:[
+            {en:'realize', kana:'リアライズ', ja:'実現する'},
+            {en:'organize', kana:'オーガナイズ', ja:'組織する'},
+            {en:'modernize', kana:'モダナイズ', ja:'近代化する'},
+            {en:'memorize', kana:'メモライズ', ja:'記憶する'}
+          ]
+        },
+        { id:'fy', form:'-fy', variants:['fy'], type:'suffix',
+          meaning:'〜化する、〜にする',
+          note:'「〜にする」という意味の動詞を作る、-izeと似た働きを持つ。',
+          words:[
+            {en:'simplify', kana:'シンプリファイ', ja:'単純化する'},
+            {en:'classify', kana:'クラシファイ', ja:'分類する'},
+            {en:'satisfy', kana:'サティスファイ', ja:'満足させる'},
+            {en:'identify', kana:'アイデンティファイ', ja:'特定する'}
+          ]
+        }
+      ]
+    },
+    {
+      id:'advize', title:'副詞化', cat:'接尾辞',
+      parts:[
+        { id:'ly', form:'-ly', variants:['ly'], type:'suffix',
+          meaning:'〜に、〜的に',
+          note:'形容詞を副詞に変える、最も基本的な副詞化の接尾辞。',
+          words:[
+            {en:'quickly', kana:'クイックリー', ja:'すばやく'},
+            {en:'slowly', kana:'スローリー', ja:'ゆっくりと'},
+            {en:'happily', kana:'ハピリー', ja:'幸せに'},
+            {en:'finally', kana:'ファイナリー', ja:'ついに'}
+          ]
+        }
+      ]
+    }
+  ];
+
+  var TOTAL_PARTS = 0;
+  GROUPS.forEach(function(g){ TOTAL_PARTS += g.parts.length; });
+
+  var STORAGE_KEY = 'gogenlab_v1';
+
+  function findPart(pId){
+    for(var i=0;i<GROUPS.length;i++){
+      for(var j=0;j<GROUPS[i].parts.length;j++){
+        if(GROUPS[i].parts[j].id===pId) return GROUPS[i].parts[j];
+      }
+    }
+    return null;
+  }
+  function wordKey(pId, wIndex){ return pId + '|' + wIndex; }
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){ var s = JSON.parse(raw); return normalize(s); }
+    }catch(e){}
+    return normalize({});
+  }
+  function normalize(s){
+    return {
+      partStatus: s.partStatus || {},
+      wordStatus: s.wordStatus || {},
+      sound: s.sound !== false,
+      cursor: s.cursor && typeof s.cursor.gIdx === 'number'
+        ? s.cursor
+        : { gIdx:0, pIdx:0, phase:'part', wIdx:0 },
+      reviewReturn: s.reviewReturn || null,
+      celebration: !!s.celebration
+    };
+  }
+  var state = loadState();
+  var sessionStreak = 0;
+  var sessionBadgeTiersShown = {};
+  var saveTimer = null;
+  function saveState(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+    }, 60);
+  }
+
+  /* current part's word order, rebuilt whenever we enter phase='words' for a part.
+     Unknown-flagged words (from a previous visit) are sorted first; a word marked
+     unknown DURING this pass is appended once more at the end (same-session re-ask). */
+  var currentWordOrder = null;
+  var currentWordOrderPartId = null;
+
+  function buildWordOrder(part){
+    var idxs = part.words.map(function(_,i){ return i; });
+    idxs.sort(function(a,b){
+      var ua = state.wordStatus[wordKey(part.id,a)] === 'unknown' ? 0 : 1;
+      var ub = state.wordStatus[wordKey(part.id,b)] === 'unknown' ? 0 : 1;
+      return ua - ub;
+    });
+    return idxs;
+  }
+
+  function completedPartsCount(){
+    var c = 0;
+    for(var k in state.partStatus){ if(state.partStatus[k]==='completed') c++; }
+    return c;
+  }
+
+  /* ---- Navigate to next available (non-completed) part; returns false if none left ---- */
+  function isPartCompleted(gIdx, pIdx){
+    return state.partStatus[GROUPS[gIdx].parts[pIdx].id] === 'completed';
+  }
+  function findNextPart(fromGIdx, fromPIdx){
+    var gIdx = fromGIdx, pIdx = fromPIdx;
+    while(gIdx < GROUPS.length){
+      var parts = GROUPS[gIdx].parts;
+      while(pIdx < parts.length){
+        if(!isPartCompleted(gIdx, pIdx)) return { gIdx:gIdx, pIdx:pIdx };
+        pIdx++;
+      }
+      gIdx++; pIdx = 0;
+    }
+    return null;
+  }
+  function isGroupFullyCompleted(gIdx){
+    var parts = GROUPS[gIdx].parts;
+    for(var i=0;i<parts.length;i++){ if(!isPartCompleted(gIdx,i)) return false; }
+    return true;
+  }
+
+  function ensureValidCursor(){
+    var cur = state.cursor;
+    if(cur.review) return; /* intentionally reviewing via TOC: never auto-redirect */
+    if(cur.gIdx >= GROUPS.length){
+      var found = findNextPart(0,0);
+      if(!found){ state.celebration = true; return; }
+      state.cursor = { gIdx:found.gIdx, pIdx:found.pIdx, phase:'part', wIdx:0 };
+      return;
+    }
+    if(isPartCompleted(cur.gIdx, cur.pIdx)){
+      var next = findNextPart(cur.gIdx, cur.pIdx + 1);
+      if(!next){
+        next = findNextPart(0,0);
+        if(!next){ state.celebration = true; return; }
+      }
+      state.cursor = { gIdx:next.gIdx, pIdx:next.pIdx, phase:'part', wIdx:0 };
+    }
+  }
+
+  /* ---- Speech (applied words only) ---- */
+  function syncSoundSub(){
+    var sub = document.getElementById('soundSub');
+    if(sub){
+      sub.textContent = hasEnglishVoice
+        ? '応用単語が出るたびに音声が鳴ります'
+        : 'この端末に英語の読み上げ音声が見つかりません。端末の設定アプリで音声データを追加すると使えることがあります。';
+    }
+  }
+  var bestVoice = null;
+  var voicesReady = false;
+  var hasEnglishVoice = false;
+  function pickBestVoice(){
+    if(!('speechSynthesis' in window)) return;
+    var voices = window.speechSynthesis.getVoices() || [];
+    if(voices.length === 0) return;
+    voicesReady = true;
+    var enVoices = voices.filter(function(v){ return /^en/i.test(v.lang); });
+    if(enVoices.length === 0){ bestVoice = null; hasEnglishVoice = false; syncSoundSub(); return; }
+    hasEnglishVoice = true;
+    var goodNamePattern = /(Google|Natural|Neural|Premium|Enhanced|Samantha|Aria|Jenny|Ava|Emma|Zira|Susan|Karen)/i;
+    var badNamePattern = /(Compact|eSpeak|Whisper|Novelty|Bells|Bad News|Bahh|Organ)/i;
+    var candidates = enVoices.filter(function(v){ return !badNamePattern.test(v.name); });
+    if(candidates.length === 0) candidates = enVoices;
+    var usVoices = candidates.filter(function(v){ return /en-US/i.test(v.lang); });
+    var pool = usVoices.length ? usVoices : candidates;
+    var named = pool.filter(function(v){ return goodNamePattern.test(v.name); });
+    bestVoice = (named[0] || pool[0] || null);
+    syncSoundSub();
+  }
+  try{
+    if('speechSynthesis' in window){
+      pickBestVoice();
+      window.speechSynthesis.onvoiceschanged = pickBestVoice;
+    }
+  }catch(e){}
+  function speak(text){
+    if(!('speechSynthesis' in window)) return;
+    if(!voicesReady) pickBestVoice();
+    if(!hasEnglishVoice || !bestVoice) return;
+    try{
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = bestVoice.lang;
+      u.voice = bestVoice;
+      u.rate = 0.92;
+      u.pitch = 1;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  function maybeSpeakCurrentWord(){
+    if(!state.sound || state.celebration) return;
+    if(state.cursor.phase !== 'words') return;
+    var part = GROUPS[state.cursor.gIdx].parts[state.cursor.pIdx];
+    if(!currentWordOrder || currentWordOrderPartId !== part.id) return;
+    var wIndex = currentWordOrder[state.cursor.wIdx];
+    var w = part.words[wIndex];
+    if(w) speak(w.en);
+  }
+
+  /* ---- Highlight the part inside an applied word ---- */
+  function highlightWord(word, part){
+    var w = word.en;
+    var lower = w.toLowerCase();
+    var variants = part.variants.slice().sort(function(a,b){ return b.length - a.length; });
+    for(var i=0;i<variants.length;i++){
+      var v = variants[i].toLowerCase();
+      if(part.type === 'prefix' && lower.indexOf(v) === 0){
+        return '<span class="hl">' + w.slice(0, v.length) + '</span>' + w.slice(v.length);
+      }
+      if(part.type === 'suffix' && lower.lastIndexOf(v) === lower.length - v.length){
+        return w.slice(0, w.length - v.length) + '<span class="hl">' + w.slice(w.length - v.length) + '</span>';
+      }
+      if(part.type === 'root'){
+        var idx = lower.indexOf(v);
+        if(idx >= 0) return w.slice(0,idx) + '<span class="hl">' + w.slice(idx, idx+v.length) + '</span>' + w.slice(idx+v.length);
+      }
+    }
+    return w;
+  }
+
+  /* ---- DOM refs ---- */
+  var elPill = document.getElementById('progressPill');
+  var elStage = document.getElementById('stage');
+  var elStart = document.getElementById('startOverlay');
+  var elSoundBtn = document.getElementById('soundBtn');
+
+  function updateProgressPill(){
+    elPill.innerHTML = '<b>' + completedPartsCount() + '</b>/' + TOTAL_PARTS + 'パーツ完了';
+  }
+  function updateSoundIcon(){
+    elSoundBtn.classList.toggle('off', !state.sound);
+  }
+
+  /* ---- Streak badges ---- */
+  var STREAK_TIERS = [
+    {n:5,  title:'ウォーミングアップ！',   tier:1},
+    {n:15, title:'がんばり屋！',           tier:2},
+    {n:30, title:'集中モード突入！',       tier:3},
+    {n:50, title:'単語ハンター！',         tier:4},
+    {n:80, title:'快進撃！',               tier:5},
+    {n:120,title:'鬼の集中力！',           tier:6}
+  ];
+  function confettiBurst(count, colors){
+    for(var i=0;i<count;i++){
+      var p = document.createElement('div');
+      p.className = 'confetti-piece';
+      var angle = Math.random()*Math.PI*2;
+      var dist = 60 + Math.random()*120;
+      p.style.setProperty('--dx', (Math.cos(angle)*dist)+'px');
+      p.style.setProperty('--dy', (Math.sin(angle)*dist - 40)+'px');
+      p.style.setProperty('--rot', (Math.random()*360)+'deg');
+      p.style.background = colors[Math.floor(Math.random()*colors.length)];
+      p.style.left = (48 + Math.random()*4) + '%';
+      document.body.appendChild(p);
+      setTimeout(function(el){ return function(){ el.remove(); }; }(p), 1600);
+    }
+  }
+  function showBadge(title, sub, tier){
+    var toast = document.createElement('div');
+    toast.className = 'badge-toast tier-' + tier;
+    toast.innerHTML = '<div class="bt-title">' + title + '</div>' + (sub ? '<div class="bt-sub">' + sub + '</div>' : '');
+    document.body.appendChild(toast);
+    setTimeout(function(){ toast.remove(); }, 2200);
+    if(tier === 'group'){
+      confettiBurst(36, ['#4E9C82','#E2A93B','#E1563F','#6455A6']);
+    } else if(typeof tier === 'number' && tier >= 5){
+      confettiBurst(22, ['#4E9C82','#E2A93B','#6455A6']);
+    } else if(typeof tier === 'number' && tier >= 3){
+      confettiBurst(12, ['#E2A93B','#6455A6']);
+    }
+  }
+  function bumpSessionStreak(){
+    sessionStreak++;
+    for(var i=STREAK_TIERS.length-1;i>=0;i--){
+      var t = STREAK_TIERS[i];
+      if(sessionStreak === t.n && !sessionBadgeTiersShown[t.n]){
+        sessionBadgeTiersShown[t.n] = true;
+        showBadge(t.title, '連続' + t.n + '枚めくった', t.tier);
+        break;
+      }
+    }
+  }
+
+  /* ============ Rendering ============ */
+  function renderCard(){
+    ensureValidCursor();
+    if(state.celebration){ renderCelebration(); return; }
+    var cur = state.cursor;
+    var part = GROUPS[cur.gIdx].parts[cur.pIdx];
+
+    if(cur.phase === 'part'){
+      renderPartCard(part);
+    } else {
+      if(!currentWordOrder || currentWordOrderPartId !== part.id){
+        currentWordOrder = buildWordOrder(part);
+        currentWordOrderPartId = part.id;
+      }
+      if(state.cursor.wIdx >= currentWordOrder.length || state.cursor.wIdx < 0){
+        state.cursor.wIdx = 0;
+        state.cursor.judged = false;
+      }
+      renderWordCard(part);
+    }
+    updateProgressPill();
+  }
+
+  function renderPartCard(part){
+    var revealed = state.cursor.viewBack;
+    var review = !!state.cursor.review;
+    elStage.innerHTML =
+      '<div class="deck-shadow d2"></div>' +
+      '<div class="deck-shadow d1"></div>' +
+      '<div class="card" id="card">' +
+        '<div class="ring-holes"><span></span><span></span></div>' +
+        '<div class="cat-tag part">' + GROUPS[state.cursor.gIdx].cat + (review ? ' ・ 復習中' : '') + '</div>' +
+        '<div class="card-word part-form">' + part.form + '</div>' +
+        (revealed ?
+          '<div class="card-divider"></div>' +
+          '<div class="card-meaning">' + part.meaning + '</div>' +
+          '<div class="card-note">' + part.note + '</div>' +
+          '<div class="card-hint" style="margin-top:auto">タップして応用単語を見る</div>'
+        : '<div class="card-hint" style="margin-top:auto">タップして意味を見る</div>') +
+      '</div>';
+
+    var cardEl = document.getElementById('card');
+    cardEl.addEventListener('click', function(){ onTapPartCard(); });
+  }
+
+  function renderWordCard(part){
+    var wIndex = currentWordOrder[state.cursor.wIdx];
+    var w = part.words[wIndex];
+    var key = wordKey(part.id, wIndex);
+    var revealed = !!state.cursor.judged;
+    var review = !!state.cursor.review;
+
+    elStage.innerHTML =
+      '<div class="deck-shadow d2"></div>' +
+      '<div class="deck-shadow d1"></div>' +
+      '<div class="card" id="card">' +
+        '<div class="ring-holes"><span></span><span></span></div>' +
+        '<div class="cat-tag word">応用単語・' + part.form + (review ? ' ・ 復習中' : '') + '</div>' +
+        '<div class="card-word">' + highlightWord(w, part) + '</div>' +
+        '<div class="card-kana">' + w.kana + '</div>' +
+        (state.sound ? '<div class="speak-dot"><svg viewBox="0 0 24 24" fill="none" stroke="#E1563F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6h4l5 5V4L7 9H3z"></path></svg></div>' : '') +
+        (revealed ?
+          '<div class="card-divider"></div>' +
+          '<div class="card-meaning">' + w.ja + '</div>' +
+          (review
+            ? '<div class="card-hint" style="margin-top:auto">タップして次へ</div>'
+            : '<div class="judge-row">' +
+                '<button class="judge-btn no" id="judgeNo">わからなかった</button>' +
+                '<button class="judge-btn yes" id="judgeYes">わかった</button>' +
+              '</div>')
+        : '<div class="card-hint" style="margin-top:auto">タップして意味を見る</div>') +
+      '</div>';
+
+    var cardEl = document.getElementById('card');
+    if(revealed && review){
+      cardEl.addEventListener('click', function(){ advanceReviewWord(); });
+    } else if(revealed){
+      document.getElementById('judgeYes').addEventListener('click', function(e){
+        e.stopPropagation();
+        onJudgeWord(key, true);
+      });
+      document.getElementById('judgeNo').addEventListener('click', function(e){
+        e.stopPropagation();
+        onJudgeWord(key, false);
+      });
+    } else {
+      cardEl.addEventListener('click', function(){
+        state.cursor.judged = true;
+        saveState();
+        renderCard();
+      });
+    }
+  }
+
+  function renderCelebration(){
+    elStage.innerHTML =
+      '<div class="celebrate">' +
+        '<div class="glyph">🔬</div>' +
+        '<h2>全パーツ制覇！</h2>' +
+        '<p>収録した' + TOTAL_PARTS + '個のパーツをすべて覚えました。<br>目次からいつでも復習できます。</p>' +
+      '</div>';
+    updateProgressPill();
+  }
+
+  /* ============ Interaction ============ */
+  function onTapPartCard(){
+    if(!state.cursor.viewBack){
+      state.cursor.viewBack = true;
+      saveState();
+      renderCard();
+    } else {
+      enterWordsPhase();
+    }
+  }
+
+  function enterWordsPhase(){
+    state.cursor.phase = 'words';
+    state.cursor.wIdx = 0;
+    state.cursor.viewBack = false;
+    state.cursor.judged = false;
+    var part = GROUPS[state.cursor.gIdx].parts[state.cursor.pIdx];
+    currentWordOrder = buildWordOrder(part);
+    currentWordOrderPartId = part.id;
+    bumpSessionStreak();
+    saveState();
+    renderCard();
+    maybeSpeakCurrentWord();
+  }
+
+  function onJudgeWord(key, known){
+    state.wordStatus[key] = known ? 'known' : 'unknown';
+    if(!known){
+      currentWordOrder.push(currentWordOrder[state.cursor.wIdx]);
+    }
+    saveState();
+    advanceFromWord();
+  }
+
+  /* Moving on from a word: either the next word in this part, or — once every
+     applied word has been seen once — the part is automatically marked
+     complete (no manual button; Q-C: "one full pass through completes it"). */
+  function advanceFromWord(){
+    bumpSessionStreak();
+    if(state.cursor.wIdx < currentWordOrder.length - 1){
+      state.cursor.wIdx++;
+      state.cursor.judged = false;
+      saveState();
+      renderCard();
+      maybeSpeakCurrentWord();
+      return;
+    }
+
+    var gIdx = state.cursor.gIdx, pIdx = state.cursor.pIdx;
+    var part = GROUPS[gIdx].parts[pIdx];
+    state.partStatus[part.id] = 'completed';
+
+    var wasLastInGroup = true;
+    for(var i=0;i<GROUPS[gIdx].parts.length;i++){
+      if(i!==pIdx && !isPartCompleted(gIdx,i)){ wasLastInGroup = false; break; }
+    }
+
+    var next = findNextPart(gIdx, pIdx + 1);
+    if(!next) next = findNextPart(0,0);
+    if(!next){
+      state.celebration = true;
+    } else {
+      state.cursor = { gIdx:next.gIdx, pIdx:next.pIdx, phase:'part', wIdx:0 };
+    }
+    saveState();
+
+    if(wasLastInGroup){
+      showBadge(GROUPS[gIdx].title + 'グループ 完了！', 'すべてのパーツを覚えました', 'group');
+    }
+    renderCard();
+    maybeSpeakCurrentWord();
+  }
+
+  /* ---- Review mode (from TOC, does not affect wordStatus/partStatus) ---- */
+  function advanceReviewWord(){
+    bumpSessionStreak();
+    if(state.cursor.wIdx < currentWordOrder.length - 1){
+      state.cursor.wIdx++;
+      state.cursor.judged = false;
+      saveState();
+      renderCard();
+      maybeSpeakCurrentWord();
+      return;
+    }
+    finishReview();
+  }
+  function finishReview(){
+    if(state.reviewReturn){
+      state.cursor = state.reviewReturn;
+      state.reviewReturn = null;
+    } else {
+      var next = findNextPart(0,0);
+      if(next){ state.cursor = { gIdx:next.gIdx, pIdx:next.pIdx, phase:'part', wIdx:0 }; }
+      else { state.celebration = true; }
+    }
+    saveState();
+    renderCard();
+    maybeSpeakCurrentWord();
+  }
+
+  /* ---- Modals ---- */
+  var modalOpenCount = 0;
+  function openModal(id){
+    modalOpenCount++;
+    document.getElementById(id).classList.add('open');
+  }
+  function closeModal(id){
+    document.getElementById(id).classList.remove('open');
+    modalOpenCount = Math.max(0, modalOpenCount - 1);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-close]'), function(btn){
+    btn.addEventListener('click', function(){ closeModal(btn.getAttribute('data-close')); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.modal-back'), function(back){
+    back.addEventListener('click', function(e){
+      if(e.target === back) closeModal(back.id);
+    });
+  });
+
+  /* ---- Settings ---- */
+  var soundSwitch = document.getElementById('soundSwitch');
+  function renderSettings(){
+    soundSwitch.classList.toggle('on', state.sound);
+    syncSoundSub();
+  }
+  document.getElementById('settingsBtn').addEventListener('click', function(){
+    renderSettings();
+    openModal('settingsModal');
+  });
+  soundSwitch.addEventListener('click', function(){
+    state.sound = !state.sound;
+    saveState(); renderSettings(); updateSoundIcon();
+  });
+  elSoundBtn.addEventListener('click', function(){
+    state.sound = !state.sound;
+    saveState(); updateSoundIcon();
+    if(state.sound) maybeSpeakCurrentWord();
+  });
+
+  /* ---- TOC (review) ---- */
+  function renderToc(){
+    var html = '';
+    GROUPS.forEach(function(g, gIdx){
+      var doneCount = 0;
+      g.parts.forEach(function(p){ if(state.partStatus[p.id]==='completed') doneCount++; });
+      html += '<div class="toc-group">' +
+        '<div class="toc-group-head">' +
+          '<div class="toc-group-title">' + g.title + '<small>' + g.cat + '</small></div>' +
+          '<div class="toc-group-count">' + doneCount + '/' + g.parts.length + '</div>' +
+        '</div>';
+      g.parts.forEach(function(p, pIdx){
+        var done = state.partStatus[p.id] === 'completed';
+        html += '<div class="toc-part-row" data-jump-g="' + gIdx + '" data-jump-p="' + pIdx + '">' +
+          '<div><div class="toc-part-form">' + p.form + '</div><div class="toc-part-meaning">' + p.meaning + '</div></div>' +
+          '<div class="toc-status ' + (done ? 'done' : 'todo') + '">' + (done ? '完了' : '未完了') + '</div>' +
+        '</div>';
+      });
+      html += '</div>';
+    });
+    document.getElementById('tocList').innerHTML = html;
+    Array.prototype.forEach.call(document.querySelectorAll('.toc-part-row'), function(row){
+      row.addEventListener('click', function(){
+        var gIdx = parseInt(row.getAttribute('data-jump-g'),10);
+        var pIdx = parseInt(row.getAttribute('data-jump-p'),10);
+        if(!state.cursor.review){
+          state.reviewReturn = JSON.parse(JSON.stringify(state.cursor));
+        }
+        state.cursor = { gIdx:gIdx, pIdx:pIdx, phase:'part', wIdx:0, review:true };
+        state.celebration = false;
+        saveState();
+        closeModal('tocModal');
+        renderCard();
+      });
+    });
+  }
+  document.getElementById('tocBtn').addEventListener('click', function(){
+    renderToc();
+    openModal('tocModal');
+  });
+
+  /* ---- Start ---- */
+  document.getElementById('startBtn').addEventListener('click', function(){
+    try{
+      elStart.style.display = 'none';
+      renderCard();
+      updateSoundIcon();
+      maybeSpeakCurrentWord();
+    }catch(err){
+      elStart.style.display = 'none';
+      elStage.innerHTML = '<div class="celebrate"><div class="glyph">⚠️</div><h2>読み込みエラー</h2><p>' + (err && err.message ? err.message : '不明なエラー') + '</p></div>';
+    }
+  });
+
+  /* init (pre-start) */
+  try{
+    ensureValidCursor();
+    updateProgressPill();
+    updateSoundIcon();
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
